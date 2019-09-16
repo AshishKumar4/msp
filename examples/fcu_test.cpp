@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
     const size_t baudrate = (argc > 2) ? std::stoul(argv[2]) : 115200;
 
     fcu::FlightController fcu;
-    fcu.setLoggingLevel(msp::client::LoggingLevel::INFO);
+    fcu.setLoggingLevel(msp::client::LoggingLevel::DEBUG);
     // wait for connection
     fcu.connect(device, baudrate);
 

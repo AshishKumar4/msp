@@ -12,7 +12,9 @@ FlightController::~FlightController() { disconnect(); }
 
 bool FlightController::connect(const std::string &device, const size_t baudrate,
                                const double &timeout, const bool print_info) {
-    if(!client_.start(device, baudrate)) return false;
+    if(!client_.start(device, baudrate)) {
+        return false;
+    }
 
     msp::msg::FcVariant fcvar(fw_variant_);
     if(client_.sendMessage(fcvar, timeout)) {
@@ -20,12 +22,14 @@ bool FlightController::connect(const std::string &device, const size_t baudrate,
         if(print_info) std::cout << fcvar;
     }
 
+    bool legacyProtocol = true;
     if(fw_variant_ != msp::FirmwareVariant::MWII) {
         msp::msg::ApiVersion api_version(fw_variant_);
         if(client_.sendMessage(api_version, timeout)) {
             if(print_info) std::cout << api_version;
             msp_version_ = api_version.major();
             client_.setVersion(msp_version_);
+            legacyProtocol = false;
         }
     }
 
@@ -52,13 +56,14 @@ bool FlightController::connect(const std::string &device, const size_t baudrate,
     if(print_info) std::cout << status;
     sensors_ = status.sensors;
 
-    msp::msg::Ident ident(fw_variant_);
-    client_.sendMessage(ident, timeout);
-    if(print_info) std::cout << ident;
-    capabilities_ = ident.capabilities;
-
-    // get boxes
-    initBoxes();
+    if(legacyProtocol) {
+        msp::msg::Ident ident(fw_variant_);
+        client_.sendMessage(ident, timeout);
+        if(print_info) std::cout << ident;
+        capabilities_ = ident.capabilities;
+    }
+	
+	initBoxes();
 
     // determine channel mapping
     if(getFwVariant() == msp::FirmwareVariant::MWII) {
@@ -302,6 +307,35 @@ int FlightController::updateFeatures(const std::set<std::string> &add,
     if(!reboot()) return -1;
 
     return 1;
+}
+
+bool FlightController::arm(const bool arm) {
+    // arm:
+    // throttle: 1000 (bottom), yaw: 2000 (right)
+    // disarm:
+    // throttle: 1000 (bottom), yaw: 1000 (left)
+
+    const uint16_t yaw = arm ? 2000 : 1000;
+
+    return setRc(1500, 1500, yaw, 1000, 1000, 1000, 1000, 1000);
+}
+
+bool FlightController::arm_block() {
+    // attempt to arm while FC is disarmed
+    while(isArmed() == false) {
+        arm(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    return true;
+}
+
+bool FlightController::disarm_block() {
+    // attempt to disarm while FC is armed
+    while(isArmed() == true) {
+        arm(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    return true;
 }
 
 }  // namespace fcu

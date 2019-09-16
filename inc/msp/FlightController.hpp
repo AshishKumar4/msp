@@ -152,6 +152,25 @@ public:
     bool setRc(const std::vector<uint16_t> channels);
 
     /**
+     * @brief arm arm or disarm FC
+     * @param arm true: will arm FC, false: will disarm FC
+     * @return true on success
+     */
+    bool arm(const bool arm);
+
+    /**
+     * @brief arm_block attempt to arm and wait for status feedback, e.g. this method will block until the FC is able to aim
+     * @return
+     */
+    bool arm_block();
+
+    /**
+     * @brief disarm_block attempt to disarm and wait for status feedback
+     * @return
+     */
+    bool disarm_block();
+
+    /**
      * @brief Register callback function that is called when type is received
      * @param callback Pointer to callback function (class method)
      * @param context Object with callback method
@@ -338,9 +357,9 @@ public:
         const std::set<std::string> &add    = std::set<std::string>(),
         const std::set<std::string> &remove = std::set<std::string>());
 
-private:
     // Client instance for managing the actual comms with the flight controller
     msp::client::Client client_;
+private:
 
     // parameters updated by the connect method to cache flight controller info
     std::string board_name_;

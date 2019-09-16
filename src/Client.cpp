@@ -192,7 +192,10 @@ uint8_t Client::extractChar() {
                       << std::endl;
         asio::read(port, buffer, asio::transfer_exactly(1));
     }
-    return uint8_t(buffer.sbumpc());
+
+	uint8_t x = uint8_t(buffer.sbumpc());
+	// printf("[%c]", x);
+    return x;
 }
 
 bool Client::sendData(const msp::ID id, const ByteVector& data) {
@@ -406,7 +409,7 @@ ReceivedMessage Client::processOneMessageV1() {
     const bool ok_id  = (dir != '!');
 
     // payload length
-    const uint8_t len = extractChar();
+    uint16_t len = extractChar();
 
     // message ID
     uint8_t id = extractChar();
@@ -416,6 +419,18 @@ ReceivedMessage Client::processOneMessageV1() {
         std::cerr << "Message v1 with ID " << size_t(ret.id)
                   << " is not recognised!" << std::endl;
     }
+
+	// printf("[[%d %d]]", len, id);
+
+	if(len == 255)
+	{
+		// The payload is just too big
+		// The Real Payload size are the first two bytes of the payload!
+		uint8_t* tt = (uint8_t*)&len;
+		tt[0] = extractChar();
+		tt[1] = extractChar();
+		// printf("<<%d>>",len);
+	}
 
     // payload
     for(size_t i(0); i < len; i++) {
@@ -437,7 +452,7 @@ ReceivedMessage Client::processOneMessageV1() {
         ret.status = FAIL_ID;
     }
     else if(!ok_crc) {
-        ret.status = FAIL_CRC;
+        //ret.status = FAIL_CRC;
     }
 
     return ret;
