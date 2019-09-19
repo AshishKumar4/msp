@@ -422,10 +422,13 @@ ReceivedMessage Client::processOneMessageV1() {
 
 	// printf("[[%d %d]]", len, id);
 
+	bool jumbomsg = false;
+
 	if(len == 255)
 	{
 		// The payload is just too big
 		// The Real Payload size are the first two bytes of the payload!
+		jumbomsg = true;
 		uint8_t* tt = (uint8_t*)&len;
 		tt[0] = extractChar();
 		tt[1] = extractChar();
@@ -439,7 +442,13 @@ ReceivedMessage Client::processOneMessageV1() {
 
     // CRC
     const uint8_t rcv_crc = extractChar();
-    const uint8_t exp_crc = crcV1(id, ret.payload);
+    uint8_t exp_crc = crcV1(id, ret.payload);
+
+	if(jumbomsg)
+	{
+		exp_crc = rcv_crc;
+	}
+
     const bool ok_crc     = (rcv_crc == exp_crc);
 
     if(log_level_ >= WARNING && !ok_crc) {
@@ -452,7 +461,7 @@ ReceivedMessage Client::processOneMessageV1() {
         ret.status = FAIL_ID;
     }
     else if(!ok_crc) {
-        //ret.status = FAIL_CRC;
+        ret.status = FAIL_CRC;
     }
 
     return ret;

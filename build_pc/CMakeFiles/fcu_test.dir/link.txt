@@ -1,0 +1,1 @@
+/usr/bin/clang++-8    -rdynamic CMakeFiles/fcu_test.dir/examples/fcu_test.cpp.o  -o fcu_test -Wl,-rpath,"/root/Desktop/Anemoi Drone Project/Drone Software/Dependencies/msp/build_pc" libmsp_fcu.so libmspclient.so -lpthread 

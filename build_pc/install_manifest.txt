@@ -1,0 +1,13 @@
+/usr/local/lib/libmsp_fcu.so
+/usr/local/lib/libmspclient.so
+/usr/local/include//msp/FlightController.hpp
+/usr/local/include//msp/FlightMode.hpp
+/usr/local/include//msp/PeriodicTimer.hpp
+/usr/local/include//msp/FirmwareVariants.hpp
+/usr/local/include//msp/Subscription.hpp
+/usr/local/include//msp/Value.hpp
+/usr/local/include//msp/msp_msg.hpp
+/usr/local/include//msp/ByteVector.hpp
+/usr/local/include//msp/Client.hpp
+/usr/local/include//msp/Message.hpp
+/usr/local/lib/pkgconfig/msp.pc

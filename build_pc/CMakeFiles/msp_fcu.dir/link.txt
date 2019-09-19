@@ -1,0 +1,1 @@
+/usr/bin/clang++-8 -fPIC   -shared -Wl,-soname,libmsp_fcu.so -o libmsp_fcu.so CMakeFiles/msp_fcu.dir/src/FlightController.cpp.o -Wl,-rpath,"/root/Desktop/Anemoi Drone Project/Drone Software/Dependencies/msp/build_pc:" libmspclient.so -lpthread 

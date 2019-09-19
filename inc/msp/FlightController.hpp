@@ -227,8 +227,12 @@ public:
      * means no timeout.
      * @return True on success
      */
-    bool sendMessage(msp::Message &message, const double timeout = 0) {
+    bool sendMessage(msp::Message &message, const double timeout = 1) {
         return client_.sendMessage(message, timeout);
+    }
+
+    bool sendMessageNoWait(msp::Message &message) {
+        return client_.sendMessageNoWait(message);
     }
 
     /**
